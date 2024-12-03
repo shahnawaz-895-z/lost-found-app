@@ -14,8 +14,6 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
-import axios from 'axios';
-import * as FileSystem from 'expo-file-system';
 
 const ReportLostItem = ({ navigation }) => {
   const [time, setTime] = useState(new Date());
@@ -39,8 +37,6 @@ const ReportLostItem = ({ navigation }) => {
     'Others',
   ];
 
-  const HUGGING_FACE_API_KEY = 'your_hugging_face_api_key_here'; // Replace with your actual API key
-
   const pickImage = async () => {
     try {
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -51,7 +47,7 @@ const ReportLostItem = ({ navigation }) => {
       }
 
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Using the correct API
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.5,
@@ -59,50 +55,10 @@ const ReportLostItem = ({ navigation }) => {
 
       if (!result.canceled && result.assets?.length > 0) {
         setPhoto(result.assets[0].uri);
-        handleImageUpload(result.assets[0]);
       }
     } catch (error) {
       console.error('Image selection error:', error);
       Alert.alert('Error', 'Failed to select image');
-    }
-  };
-
-  const handleImageUpload = async (asset) => {
-    if (!asset.uri) {
-      console.error('No image asset provided');
-      return;
-    }
-
-    setIsLoading(true);
-    const huggingFaceUrl = 'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base';
-
-    try {
-      const base64ImageData = await FileSystem.readAsStringAsync(asset.uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-
-      const result = await axios.post(
-        huggingFaceUrl,
-        { inputs: base64ImageData },
-        {
-          headers: {
-            Authorization: `Bearer ${HUGGING_FACE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-
-      if (result.data?.[0]?.generated_text) {
-        setDescription(result.data[0].generated_text);
-      } else {
-        setDescription('No description available');
-      }
-    } catch (error) {
-      console.error('Error processing image:', error);
-      Alert.alert('Error', 'Failed to process image. Please try again.');
-      setDescription('');
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -112,7 +68,6 @@ const ReportLostItem = ({ navigation }) => {
       return;
     }
 
-    // You can add more robust validation or API submission logic here
     Alert.alert('Success', 'Report Submitted Successfully!', [
       { text: 'OK', onPress: () => navigation.goBack() }
     ]);

@@ -7,6 +7,7 @@ import SignUpScreen from './screens/SignUpScreen';
 import HomePage from './screens/HomePage';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import ReportLostItem from './screens/ReportLostItem';
+import ReportFoundItem from './screens/ReportFoundItem';
 
 const Stack = createStackNavigator();
 
@@ -19,6 +20,7 @@ export default function App() {
         <Stack.Screen name="HomePage" component={HomePage} />
         <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
         <Stack.Screen name="ReportLostItem" component={ReportLostItem} />
+        <Stack.Screen name="ReportFoundItem" component={ReportFoundItem} />
       </Stack.Navigator>
     </NavigationContainer>
   );
