@@ -30,7 +30,7 @@ const SignUpScreen = ({ navigation }) => {
         }
     
         try {
-            const response = await fetch('http://192.168.18.18:5000/signup', { // Updated IP address
+            const response = await fetch('http://192.168.0.114:5000/signup', { // Updated IP address
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password, confirmPassword, contact }), // Added contact

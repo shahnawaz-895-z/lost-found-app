@@ -103,7 +103,7 @@ const ReportLostItem = ({ navigation }) => {
         });
       }
 
-      const response = await fetch('http://192.168.18.18:5000/report-lost', {
+      const response = await fetch('http://192.168.0.114:5000/report-lost', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
