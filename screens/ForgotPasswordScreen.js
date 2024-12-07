@@ -45,7 +45,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
         </View>
     );
 };
-
+// start the style 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
