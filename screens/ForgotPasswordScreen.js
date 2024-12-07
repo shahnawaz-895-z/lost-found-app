@@ -17,7 +17,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
         console.log('Reset password for:', email);
         Alert.alert('Success', `Reset link sent to ${email}`);
     };
-
+// returning the valuee
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
