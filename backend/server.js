@@ -8,6 +8,7 @@ const path = require("path");
 const multer = require("multer");
 const fs = require("fs");
 
+
 // Create Express app
 const app = express();
 
@@ -81,6 +82,7 @@ const FoundItem = mongoose.model('FoundItem', foundItemSchema);
 // Multer Configuration for File Upload
 const storage = multer.diskStorage({
     destination(req, file, cb) {
+        console.log("path: ",__dirname)
         const uploadDir = path.join(__dirname, 'uploads');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir);
@@ -115,6 +117,7 @@ const authenticate = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded;
+        
         next();
     } catch (error) {
         return res.status(400).send('Invalid token');
@@ -217,30 +220,47 @@ app.post('/report-lost', authenticate, upload.single('photo'), async (req, res) 
 
 app.post('/report-found', authenticate, upload.single('photo'), async (req, res) => {
     try {
-        const { category, description, location, additionalDetails } = req.body;
-        const parsedAdditionalDetails = typeof additionalDetails === 'string' ? JSON.parse(additionalDetails) : additionalDetails;
-
-        const foundItem = new FoundItem({
-            userId: req.user.userId,
-            category,
-            description,
-            location,
-            additionalDetails: parsedAdditionalDetails,
-            photo: req.file ? req.file.path : null
-        });
-
-        await foundItem.save();
-        const matchedLostItems = await findPotentialMatches(foundItem);
-
-        res.status(201).json({
-            message: 'Found item reported successfully',
-            foundItem,
-            potentialMatches: matchedLostItems
-        });
+      const { category, description, location, additionalDetails } = req.body;
+      
+      // Log incoming data for debugging
+      console.log('Received Found Item Data:', {
+        category,
+        description,
+        location,
+        additionalDetails,
+        fileProvided: !!req.file
+      });
+  
+      const parsedAdditionalDetails = typeof additionalDetails === 'string' 
+        ? JSON.parse(additionalDetails) 
+        : additionalDetails;
+  
+      const foundItem = new FoundItem({
+        userId: req.user.userId,
+        category,
+        description,
+        location,
+        additionalDetails: parsedAdditionalDetails,
+        photo: req.file ? req.file.path : null
+      });
+  
+      await foundItem.save();
+      const matchedLostItems = await findPotentialMatches(foundItem);
+  
+      res.status(201).json({
+        message: 'Found item reported successfully',
+        foundItem,
+        potentialMatches: matchedLostItems
+      });
     } catch (error) {
-        res.status(500).json({ message: 'Error reporting found item', error: error.message });
+      console.error('Detailed Found Item Submission Error:', error);
+      res.status(500).json({ 
+        message: 'Error reporting found item', 
+        error: error.toString(),
+        details: error.message 
+      });
     }
-});
+  });
 
 app.get('/potential-matches/:itemId', authenticate, async (req, res) => {
     try {
