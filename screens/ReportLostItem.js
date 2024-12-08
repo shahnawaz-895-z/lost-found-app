@@ -8,9 +8,11 @@ import {
   Alert,
   Image,
   ScrollView,
+  Platform,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
+import { Ionicons } from '@expo/vector-icons';
 
 const ReportLostItem = ({ navigation }) => {
   const [hasPhoto, setHasPhoto] = useState(null);
@@ -53,28 +55,52 @@ const ReportLostItem = ({ navigation }) => {
       case 'Electronics':
         return (
           <>
-            <Text>Device Type:</Text>
-            <TextInput onChangeText={text => setAdditionalDetails(prev => ({ ...prev, deviceType: text }))} />
-            <Text>Brand:</Text>
-            <TextInput onChangeText={text => setAdditionalDetails(prev => ({ ...prev, brand: text }))} />
+            <Text style={styles.label}>Device Type:</Text>
+            <TextInput 
+              style={styles.input}
+              onChangeText={text => setAdditionalDetails(prev => ({ ...prev, deviceType: text }))}
+              placeholder="e.g., Smartphone, Laptop"
+            />
+            <Text style={styles.label}>Brand:</Text>
+            <TextInput 
+              style={styles.input}
+              onChangeText={text => setAdditionalDetails(prev => ({ ...prev, brand: text }))}
+              placeholder="e.g., Apple, Samsung"
+            />
           </>
         );
       case 'Bags':
         return (
           <>
-            <Text>Bag Type:</Text>
-            <TextInput onChangeText={text => setAdditionalDetails(prev => ({ ...prev, bagType: text }))} />
-            <Text>Color:</Text>
-            <TextInput onChangeText={text => setAdditionalDetails(prev => ({ ...prev, color: text }))} />
+            <Text style={styles.label}>Bag Type:</Text>
+            <TextInput 
+              style={styles.input}
+              onChangeText={text => setAdditionalDetails(prev => ({ ...prev, bagType: text }))}
+              placeholder="e.g., Backpack, Handbag"
+            />
+            <Text style={styles.label}>Color:</Text>
+            <TextInput 
+              style={styles.input}
+              onChangeText={text => setAdditionalDetails(prev => ({ ...prev, color: text }))}
+              placeholder="e.g., Black, Brown"
+            />
           </>
         );
       case 'Clothing':
         return (
           <>
-            <Text>Clothing Type:</Text>
-            <TextInput onChangeText={text => setAdditionalDetails(prev => ({ ...prev, clothingType: text }))} />
-            <Text>Size:</Text>
-            <TextInput onChangeText={text => setAdditionalDetails(prev => ({ ...prev, size: text }))} />
+            <Text style={styles.label}>Clothing Type:</Text>
+            <TextInput 
+              style={styles.input}
+              onChangeText={text => setAdditionalDetails(prev => ({ ...prev, clothingType: text }))}
+              placeholder="e.g., T-shirt, Jeans"
+            />
+            <Text style={styles.label}>Size:</Text>
+            <TextInput 
+              style={styles.input}
+              onChangeText={text => setAdditionalDetails(prev => ({ ...prev, size: text }))}
+              placeholder="e.g., M, L, XL"
+            />
           </>
         );
       default:
@@ -134,47 +160,61 @@ const ReportLostItem = ({ navigation }) => {
       <Text style={styles.title}>Report Lost Item</Text>
 
       {hasPhoto === null && (
-        <View>
-          <Text>Do you have a photo of the lost item?</Text>
-          <TouchableOpacity onPress={() => setHasPhoto(true)}>
-            <Text>Yes, I have a photo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setHasPhoto(false)}>
-            <Text>No photo available</Text>
-          </TouchableOpacity>
+        <View style={styles.photoPromptContainer}>
+          <Text style={styles.label}>Do you have a photo of the lost item?</Text>
+          <View style={styles.photoButtonsContainer}>
+            <TouchableOpacity style={styles.photoButton} onPress={() => setHasPhoto(true)}>
+              <Ionicons name="camera" size={24} color="#fff" />
+              <Text style={styles.photoButtonText}>Yes, I have a photo</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.photoButton} onPress={() => setHasPhoto(false)}>
+              <Ionicons name="close-circle" size={24} color="#fff" />
+              <Text style={styles.photoButtonText}>No photo available</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
 
       {hasPhoto === true && (
-        <>
-          <TouchableOpacity onPress={pickImage}>
-            <Text>Choose Photo</Text>
+        <View style={styles.photoContainer}>
+          <TouchableOpacity style={styles.choosePhotoButton} onPress={pickImage}>
+            <Ionicons name="image" size={24} color="#fff" />
+            <Text style={styles.choosePhotoText}>Choose Photo</Text>
           </TouchableOpacity>
           {photo && (
             <View style={styles.imageContainer}>
               <Image source={{ uri: photo }} style={styles.image} />
-              <Text>Photo selected</Text>
+              <Text style={styles.photoSelectedText}>Photo selected</Text>
             </View>
           )}
-        </>
+        </View>
       )}
 
       <View style={styles.pickerContainer}>
-        <Picker selectedValue={category} onValueChange={(itemValue) => setCategory(itemValue)}>
-          {categories.map((item, index) => (
-            <Picker.Item key={index} label={item} value={item} />
-          ))}
-        </Picker>
+        <Text style={styles.label}>Category:</Text>
+        <View style={styles.pickerWrapper}>
+          <Picker
+            selectedValue={category}
+            onValueChange={(itemValue) => setCategory(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Select a category" value="" />
+            {categories.map((item, index) => (
+              <Picker.Item key={index} label={item} value={item} />
+            ))}
+          </Picker>
+        </View>
       </View>
 
       {category && renderAdditionalQuestions()}
 
-      <Text>Description:</Text>
+      <Text style={styles.label}>Description:</Text>
       <TextInput
         style={styles.descriptionInput}
         multiline
         numberOfLines={4}
         onChangeText={setDescription}
+        placeholder="Provide a detailed description of the lost item"
       />
 
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -185,11 +225,132 @@ const ReportLostItem = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginVertical: 20 },
-  descriptionInput: { height: 100, textAlignVertical: 'top' },
-  submitButton: { backgroundColor: '#4a148c', padding: 15, borderRadius: 5, alignItems: 'center', marginVertical: 10 },
-  submitButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 20,
+    color: '#4a148c',
+  },
+  photoPromptContainer: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  photoButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  photoButton: {
+    backgroundColor: '#4a148c',
+    padding: 10,
+    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  photoButtonText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontSize: 14,
+  },
+  photoContainer: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  choosePhotoButton: {
+    backgroundColor: '#4a148c',
+    padding: 10,
+    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  choosePhotoText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontSize: 16,
+  },
+  imageContainer: {
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+  },
+  photoSelectedText: {
+    marginTop: 5,
+    color: '#4a148c',
+    fontWeight: 'bold',
+  },
+  pickerContainer: {
+    marginBottom: 20,
+  },
+  pickerWrapper: {
+    borderWidth: 1,
+    borderColor: '#4a148c',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#4a148c',
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#4a148c',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  descriptionInput: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#4a148c',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
+    fontSize: 16,
+    height: 120,
+    textAlignVertical: 'top',
+  },
+  submitButton: {
+    backgroundColor: '#4a148c',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });
 
 export default ReportLostItem;
+
